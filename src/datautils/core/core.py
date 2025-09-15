@@ -11,7 +11,7 @@ from decimal import Decimal
 from fractions import Fraction
 from frozendict import frozendict
 from pathlib import Path
-from typing import Any, Final, Literal, Mapping, Optional, Set
+from typing import Any, Final, Literal, Mapping, Optional, Set, Union
 from uuid import UUID
 
 from core.exceptions import DataConversionError
@@ -2499,7 +2499,7 @@ class DataIdentificationUtils:
         Checks if the value is a primitive type.
 
         This method checks if the given value is an instance of a primitive type.
-        Primitive types include int, float, str, bool, tuple, list, dict, and set.
+        Primitive types include int, float and bool.
 
         Args:
             value (Any): The value to check.
@@ -2513,12 +2513,7 @@ class DataIdentificationUtils:
             type_=(
                 int,
                 float,
-                str,
                 bool,
-                tuple,
-                list,
-                dict,
-                set,
             ),
             value=value,
         )
