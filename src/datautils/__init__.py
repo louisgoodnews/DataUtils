@@ -5,7 +5,7 @@ Date: 2025-09-15
 
 from typing import Final, Literal
 
-from core.core import DataConversionUtils, DataIdentificationUtils
+from .core.core import DataConversionUtils, DataIdentificationUtils
 
 
 __all__: Final[list[str]] = [

@@ -14,7 +14,7 @@ from pathlib import Path
 from typing import Any, Final, Literal, Mapping, Optional, Set, Union
 from uuid import UUID
 
-from core.exceptions import DataConversionError
+from .exceptions import DataConversionError
 
 
 __all__: Final[list[str]] = [
@@ -300,14 +300,149 @@ class DataConversionUtils:
             Any: The original type of the string.
         """
 
+        def _deserialize(value: Any) -> Any:
+            """ """
+
+            # Check if the value is a boolean
+            if cls.str_to_bool(value=value):
+                # Return the boolean value
+                return cls.str_to_bool(value=value)
+
+            # Check if the value is a complex number
+            elif cls.str_to_complex(value=value):
+                # Return the complex value
+                return cls.str_to_complex(value=value)
+
+            # Check if the value is a counter
+            elif cls.str_to_counter(value=value):
+                # Return the counter value
+                return cls.str_to_counter(value=value)
+
+            # Check if the value is a date
+            elif cls.str_to_date(value=value):
+                # Return the date value
+                return cls.str_to_date(value=value)
+
+            # Check if the value is a datetime
+            elif cls.str_to_datetime(value=value):
+                # Return the datetime value
+                return cls.str_to_datetime(value=value)
+
+            # Check if the value is a decimal
+            elif cls.str_to_decimal(value=value):
+                # Return the decimal value
+                return cls.str_to_decimal(value=value)
+
+            # Check if the value is a deque
+            elif cls.str_to_deque(value=value):
+                # Return the deque value
+                return cls.str_to_deque(value=value)
+
+            # Check if the value is a dictionary
+            elif cls.str_to_dict(value=value):
+                # Return the dictionary value
+                return {
+                    key: _deserialize(value=value)
+                    for (
+                        key,
+                        value,
+                    ) in cls.str_to_dict(value=value).items()
+                }
+
+            # Check if the value is a default dictionary
+            elif cls.str_to_defaultdict(value=value):
+                # Return the default dictionary value
+                return defaultdict(
+                    _deserialize(value=value), cls.str_to_defaultdict(value=value)
+                )
+
+            # Check if the value is a fraction
+            elif cls.str_to_fraction(value=value):
+                # Return the fraction value
+                return cls.str_to_fraction(value=value)
+
+            # Check if the value is a frozendict
+            elif cls.str_to_frozendict(value=value):
+                # Return the frozendict value
+                return frozendict(
+                    {
+                        key: _deserialize(value=value)
+                        for (
+                            key,
+                            value,
+                        ) in cls.str_to_frozendict(value=value).items()
+                    }
+                )
+
+            # Check if the value is a frozenset
+            elif cls.str_to_frozenset(value=value):
+                # Return the frozenset value
+                return frozenset(
+                    _deserialize(value=value)
+                    for value in cls.str_to_frozenset(value=value)
+                )
+
+            # Check if the value is a set
+            elif cls.str_to_set(value=value):
+                # Return the set value
+                return set(
+                    _deserialize(value=value) for value in cls.str_to_set(value=value)
+                )
+
+            # Check if the value is a time
+            elif cls.str_to_time(value=value):
+                # Return the time value
+                return cls.str_to_time(value=value)
+
+            # Check if the value is a timedelta
+            elif cls.str_to_timedelta(value=value):
+                # Return the timedelta value
+                return cls.str_to_timedelta(value=value)
+
+            # Check if the value is a timezone
+            elif cls.str_to_timezone(value=value):
+                # Return the timezone value
+                return cls.str_to_timezone(value=value)
+
+            # Check if the value is a UUID
+            elif cls.str_to_uuid(value=value):
+                # Return the UUID value
+                return cls.str_to_uuid(value=value)
+
+            # Check if the value is a path
+            elif cls.str_to_path(value=value):
+                # Return the path value
+                return cls.str_to_path(value=value)
+
+            # Check if the value is a bytes object
+            elif cls.str_to_bytes(value=value):
+                # Return the bytes object
+                return cls.str_to_bytes(value=value)
+
+        # Convert the string to a JSON object
         result: Union[dict[str, Any], list[Any]] = json.loads(value)
 
-        if isinstance(result, dict):
-            return {key: cls.deserialize(value=value) for key, value in result.items()}
-        elif isinstance(result, list):
-            return [cls.deserialize(value=value) for value in result]
-        else:
-            return result
+        # Check if the result is a dictionary
+        if isinstance(
+            result,
+            dict,
+        ):
+            # Deserialize the dictionary
+            return {
+                key: _deserialize(value=value)
+                for (
+                    key,
+                    value,
+                ) in result.items()
+            }
+
+        # Check if the result is a list
+        elif isinstance(
+            result,
+            list,
+        ):
+            # Deserialize the list
+            return [_deserialize(value=value) for value in result]
 
     @classmethod
     def dict_to_str(
@@ -473,10 +608,10 @@ class DataConversionUtils:
             # Serialize a dictionary
             return json.dumps(
                 {
-                    key: cls.serialize(value)
+                    key: cls.serialize(value=item)
                     for (
                         key,
-                        value,
+                        item,
                     ) in value.items()
                 }
             )
@@ -486,10 +621,10 @@ class DataConversionUtils:
             # Serialize a frozen dictionary
             return json.dumps(
                 {
-                    key: cls.serialize(value)
+                    key: cls.serialize(value=item)
                     for (
                         key,
-                        value,
+                        item,
                     ) in value.items()
                 }
             )
@@ -507,12 +642,20 @@ class DataConversionUtils:
         # Check if the value is a defaultdict
         elif DataIdentificationUtils.is_defaultdict(value=value):
             # Serialize a defaultdict
-            return cls.defaultdict_to_str(value=value)
+            return json.dumps(
+                {
+                    key: cls.serialize(value=item)
+                    for (
+                        key,
+                        item,
+                    ) in value.items()
+                }
+            )
 
         # Check if the value is a deque
         elif DataIdentificationUtils.is_deque(value=value):
             # Serialize a deque
-            return cls.deque_to_str(value=value)
+            return json.dumps([cls.serialize(item) for item in value])
 
         # Check if the value is a set
         elif DataIdentificationUtils.is_set(value=value):
@@ -646,6 +789,28 @@ class DataConversionUtils:
             return None
 
     @classmethod
+    def str_to_counter(
+        cls,
+        value: str,
+    ) -> Optional[Counter]:
+        """
+        Convert a string to a counter.
+
+        Args:
+            value (str): The string to convert.
+
+        Returns:
+            Optional[Counter]: The counter representation of the string or None if the string cannot be converted to a counter.
+        """
+
+        try:
+            # Attempt to convert the string to a counter
+            return Counter(value)
+        except ValueError:
+            # Return None if the string cannot be converted to a counter
+            return None
+
+    @classmethod
     def str_to_date(
         cls,
         value: str,
@@ -731,6 +896,50 @@ class DataConversionUtils:
             return Decimal(value)
         except ValueError:
             # Return None if the string cannot be converted to a decimal
+            return None
+
+    @classmethod
+    def str_to_defaultdict(
+        cls,
+        value: str,
+    ) -> Optional[defaultdict]:
+        """
+        Convert a string to a defaultdict.
+
+        Args:
+            value (str): The string to convert.
+
+        Returns:
+            Optional[defaultdict]: The defaultdict representation of the string or None if the string cannot be converted to a defaultdict.
+        """
+
+        try:
+            # Attempt to convert the string to a defaultdict
+            return defaultdict(cls.str_to_dict(value=value))
+        except ValueError:
+            # Return None if the string cannot be converted to a defaultdict
+            return None
+
+    @classmethod
+    def str_to_deque(
+        cls,
+        value: str,
+    ) -> Optional[deque]:
+        """
+        Convert a string to a deque.
+
+        Args:
+            value (str): The string to convert.
+
+        Returns:
+            Optional[deque]: The deque representation of the string or None if the string cannot be converted to a deque.
+        """
+
+        try:
+            # Attempt to convert the string to a deque
+            return deque(cls.str_to_list(value=value))
+        except ValueError:
+            # Return None if the string cannot be converted to a deque
             return None
 
     @classmethod
@@ -827,7 +1036,7 @@ class DataConversionUtils:
             return None
 
     @classmethod
-    def str_frozenset(
+    def str_to_frozenset(
         cls,
         value: str,
     ) -> Optional[frozenset]:
