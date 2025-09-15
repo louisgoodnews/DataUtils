@@ -598,30 +598,129 @@ class DataConversionUtils:
             str: The string representation of the value.
         """
 
-        # Check if the value is a primitive type
-        if DataIdentificationUtils.is_primitive_type(value=value):
-            # Serialize a primitive type
-            return cls.to_str(value=value)
+        def _serialize(value: Any) -> Any:
+            """
+            Serialize a value to a string.
 
-        # Check if the value is a dictionary
-        elif DataIdentificationUtils.is_dict(value=value):
-            # Serialize a dictionary
-            return json.dumps(
-                {
-                    key: cls.serialize(value=item)
+            Args:
+                value (Any): The value to serialize.
+
+            Returns:
+                Any: The string representation of the value.
+            """
+
+            # Check if the value is a primitive type
+            if DataIdentificationUtils.is_primitive_type(value=value):
+                # Serialize a primitive type
+                return cls.to_str(value=value)
+
+            # Check if the value is a dictionary
+            elif DataIdentificationUtils.is_dict(value=value):
+                # Serialize a dictionary
+                return {
+                    key: _serialize(value=item)
                     for (
                         key,
                         item,
                     ) in value.items()
                 }
-            )
 
-        # Check if the value is a frozen dictionary
-        elif DataIdentificationUtils.is_frozendict(value=value):
-            # Serialize a frozen dictionary
+            # Check if the value is a frozen dictionary
+            elif DataIdentificationUtils.is_frozendict(value=value):
+                # Serialize a frozen dictionary
+                return {
+                    key: _serialize(value=item)
+                    for (
+                        key,
+                        item,
+                    ) in value.items()
+                }
+
+            # Check if the value is a list
+            elif DataIdentificationUtils.is_list(value=value):
+                # Serialize a list
+                return [_serialize(item) for item in value]
+
+            # Check if the value is a counter
+            elif DataIdentificationUtils.is_counter(value=value):
+                # Serialize a counter
+                return cls.counter_to_str(value=value)
+
+            # Check if the value is a defaultdict
+            elif DataIdentificationUtils.is_defaultdict(value=value):
+                # Serialize a defaultdict
+                return {
+                    key: _serialize(value=item)
+                    for (
+                        key,
+                        item,
+                    ) in value.items()
+                }
+
+            # Check if the value is a deque
+            elif DataIdentificationUtils.is_deque(value=value):
+                # Serialize a deque
+                return [_serialize(item) for item in value]
+
+            # Check if the value is a set
+            elif DataIdentificationUtils.is_set(value=value):
+                # Serialize a set
+                return [_serialize(item) for item in value]
+
+            # Check if the value is a frozenset
+            elif DataIdentificationUtils.is_frozenset(value=value):
+                # Serialize a frozenset
+                return [_serialize(item) for item in value]
+
+            # Check if the value is a datetime
+            elif DataIdentificationUtils.is_datetime(value=value):
+                # Serialize a datetime
+                return cls.datetime_to_str(value=value)
+
+            # Check if the value is a date
+            elif DataIdentificationUtils.is_date(value=value):
+                # Serialize a date
+                return cls.date_to_str(value=value)
+
+            # Check if the value is a time
+            elif DataIdentificationUtils.is_time(value=value):
+                # Serialize a time
+                return cls.time_to_str(value=value)
+
+            # Check if the value is a timedelta
+            elif DataIdentificationUtils.is_timedelta(value=value):
+                # Serialize a timedelta
+                return cls.timedelta_to_str(value=value)
+
+            # Check if the value is a complex
+            elif DataIdentificationUtils.is_complex(value=value):
+                # Serialize a complex
+                return cls.complex_to_str(value=value)
+
+            # Check if the value is a bytes
+            elif DataIdentificationUtils.is_bytes(value=value):
+                # Serialize a bytes
+                return cls.bytes_to_str(value=value)
+
+            # Check if the value is a path
+            elif DataIdentificationUtils.is_path(value=value):
+                # Serialize a path
+                return cls.path_to_str(value=value)
+
+            # Check if the value is a UUID
+            elif DataIdentificationUtils.is_uuid(value=value):
+                # Serialize a UUID
+                return cls.uuid_to_str(value=value)
+
+            # Serialize a primitive type
+            return cls.to_str(value=value)
+
+        # Check if the value is a dictionary
+        if DataIdentificationUtils.is_dict(value=value):
+            # Serialize a dictionary
             return json.dumps(
                 {
-                    key: cls.serialize(value=item)
+                    key: _serialize(value=item)
                     for (
                         key,
                         item,
@@ -632,80 +731,7 @@ class DataConversionUtils:
         # Check if the value is a list
         elif DataIdentificationUtils.is_list(value=value):
             # Serialize a list
-            return json.dumps([cls.serialize(item) for item in value])
-
-        # Check if the value is a counter
-        elif DataIdentificationUtils.is_counter(value=value):
-            # Serialize a counter
-            return cls.counter_to_str(value=value)
-
-        # Check if the value is a defaultdict
-        elif DataIdentificationUtils.is_defaultdict(value=value):
-            # Serialize a defaultdict
-            return json.dumps(
-                {
-                    key: cls.serialize(value=item)
-                    for (
-                        key,
-                        item,
-                    ) in value.items()
-                }
-            )
-
-        # Check if the value is a deque
-        elif DataIdentificationUtils.is_deque(value=value):
-            # Serialize a deque
-            return json.dumps([cls.serialize(item) for item in value])
-
-        # Check if the value is a set
-        elif DataIdentificationUtils.is_set(value=value):
-            # Serialize a set
-            return json.dumps([cls.serialize(item) for item in value])
-
-        # Check if the value is a frozenset
-        elif DataIdentificationUtils.is_frozenset(value=value):
-            # Serialize a frozenset
-            return json.dumps([cls.serialize(item) for item in value])
-
-        # Check if the value is a datetime
-        elif DataIdentificationUtils.is_datetime(value=value):
-            # Serialize a datetime
-            return cls.datetime_to_str(value=value)
-
-        # Check if the value is a date
-        elif DataIdentificationUtils.is_date(value=value):
-            # Serialize a date
-            return cls.date_to_str(value=value)
-
-        # Check if the value is a time
-        elif DataIdentificationUtils.is_time(value=value):
-            # Serialize a time
-            return cls.time_to_str(value=value)
-
-        # Check if the value is a timedelta
-        elif DataIdentificationUtils.is_timedelta(value=value):
-            # Serialize a timedelta
-            return cls.timedelta_to_str(value=value)
-
-        # Check if the value is a complex
-        elif DataIdentificationUtils.is_complex(value=value):
-            # Serialize a complex
-            return cls.complex_to_str(value=value)
-
-        # Check if the value is a bytes
-        elif DataIdentificationUtils.is_bytes(value=value):
-            # Serialize a bytes
-            return cls.bytes_to_str(value=value)
-
-        # Check if the value is a path
-        elif DataIdentificationUtils.is_path(value=value):
-            # Serialize a path
-            return cls.path_to_str(value=value)
-
-        # Check if the value is a UUID
-        elif DataIdentificationUtils.is_uuid(value=value):
-            # Serialize a UUID
-            return cls.uuid_to_str(value=value)
+            return json.dumps([_serialize(item) for item in value])
 
         # Default to string conversion
         return cls.to_str(value=value)
