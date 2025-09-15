@@ -14,6 +14,8 @@ A comprehensive Python utility library for data type identification, conversion,
 
 ```bash
 git clone https://github.com/louisgoodnews/DataUtils.git
+cd DataUtils
+pip install -e .
 ```
 
 ## Usage
