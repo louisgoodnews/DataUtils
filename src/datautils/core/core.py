@@ -2705,6 +2705,24 @@ class DataIdentificationUtils:
         )
 
     @classmethod
+    def is_none(
+        cls,
+        value: Any,
+    ) -> bool:
+        """
+        Checks if the value is None.
+
+        Args:
+            value (Any): The value to check.
+
+        Returns:
+            bool: True if the value is None, False otherwise.
+        """
+
+        # Check if the value is None
+        return value is None
+
+    @classmethod
     def is_path(
         cls,
         value: Any,
