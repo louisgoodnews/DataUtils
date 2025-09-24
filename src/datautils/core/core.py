@@ -7,7 +7,7 @@ import json
 
 from collections import Counter, defaultdict, deque
 from datetime import date, datetime, time, timedelta, timezone
-from decimal import Decimal
+from decimal import Decimal, InvalidOperation
 from fractions import Fraction
 from frozendict import frozendict
 from pathlib import Path
@@ -304,42 +304,37 @@ class DataConversionUtils:
             """ """
 
             # Check if the value is a boolean
-            if cls.str_to_bool(value=value):
+            if DataIdentificationUtils.could_be_bool(value=value):
                 # Return the boolean value
                 return cls.str_to_bool(value=value)
 
             # Check if the value is a complex number
-            elif cls.str_to_complex(value=value):
+            elif DataIdentificationUtils.could_be_complex(value=value):
                 # Return the complex value
                 return cls.str_to_complex(value=value)
 
-            # Check if the value is a counter
-            elif cls.str_to_counter(value=value):
-                # Return the counter value
-                return cls.str_to_counter(value=value)
-
             # Check if the value is a date
-            elif cls.str_to_date(value=value):
+            elif DataIdentificationUtils.could_be_date(value=value):
                 # Return the date value
                 return cls.str_to_date(value=value)
 
             # Check if the value is a datetime
-            elif cls.str_to_datetime(value=value):
+            elif DataIdentificationUtils.could_be_datetime(value=value):
                 # Return the datetime value
                 return cls.str_to_datetime(value=value)
 
             # Check if the value is a decimal
-            elif cls.str_to_decimal(value=value):
+            elif DataIdentificationUtils.could_be_decimal(value=value):
                 # Return the decimal value
                 return cls.str_to_decimal(value=value)
 
             # Check if the value is a deque
-            elif cls.str_to_deque(value=value):
+            elif DataIdentificationUtils.could_be_deque(value=value):
                 # Return the deque value
                 return cls.str_to_deque(value=value)
 
             # Check if the value is a dictionary
-            elif cls.str_to_dict(value=value):
+            elif DataIdentificationUtils.could_be_dict(value=value):
                 # Return the dictionary value
                 return {
                     key: _deserialize(value=value)
@@ -350,19 +345,19 @@ class DataConversionUtils:
                 }
 
             # Check if the value is a default dictionary
-            elif cls.str_to_defaultdict(value=value):
+            elif DataIdentificationUtils.could_be_defaultdict(value=value):
                 # Return the default dictionary value
                 return defaultdict(
                     _deserialize(value=value), cls.str_to_defaultdict(value=value)
                 )
 
             # Check if the value is a fraction
-            elif cls.str_to_fraction(value=value):
+            elif DataIdentificationUtils.could_be_fraction(value=value):
                 # Return the fraction value
                 return cls.str_to_fraction(value=value)
 
             # Check if the value is a frozendict
-            elif cls.str_to_frozendict(value=value):
+            elif DataIdentificationUtils.could_be_frozendict(value=value):
                 # Return the frozendict value
                 return frozendict(
                     {
@@ -375,7 +370,7 @@ class DataConversionUtils:
                 )
 
             # Check if the value is a frozenset
-            elif cls.str_to_frozenset(value=value):
+            elif DataIdentificationUtils.could_be_frozenset(value=value):
                 # Return the frozenset value
                 return frozenset(
                     _deserialize(value=value)
@@ -383,39 +378,44 @@ class DataConversionUtils:
                 )
 
             # Check if the value is a set
-            elif cls.str_to_set(value=value):
+            elif DataIdentificationUtils.could_be_set(value=value):
                 # Return the set value
                 return set(
                     _deserialize(value=value) for value in cls.str_to_set(value=value)
                 )
 
             # Check if the value is a time
-            elif cls.str_to_time(value=value):
+            elif DataIdentificationUtils.could_be_time(value=value):
                 # Return the time value
                 return cls.str_to_time(value=value)
 
             # Check if the value is a timedelta
-            elif cls.str_to_timedelta(value=value):
+            elif DataIdentificationUtils.could_be_timedelta(value=value):
                 # Return the timedelta value
                 return cls.str_to_timedelta(value=value)
 
             # Check if the value is a timezone
-            elif cls.str_to_timezone(value=value):
+            elif DataIdentificationUtils.could_be_timezone(value=value):
                 # Return the timezone value
                 return cls.str_to_timezone(value=value)
 
             # Check if the value is a UUID
-            elif cls.str_to_uuid(value=value):
+            elif DataIdentificationUtils.could_be_uuid(value=value):
                 # Return the UUID value
                 return cls.str_to_uuid(value=value)
 
             # Check if the value is a path
-            elif cls.str_to_path(value=value):
+            elif DataIdentificationUtils.could_be_path(value=value):
                 # Return the path value
                 return cls.str_to_path(value=value)
 
+            # Check if the value is a counter
+            elif DataIdentificationUtils.could_be_counter(value=value):
+                # Return the counter value
+                return cls.str_to_counter(value=value)
+
             # Check if the value is a bytes object
-            elif cls.str_to_bytes(value=value):
+            elif DataIdentificationUtils.could_be_bytes(value=value):
                 # Return the bytes object
                 return cls.str_to_bytes(value=value)
 
@@ -751,6 +751,14 @@ class DataConversionUtils:
             Optional[bool]: The boolean representation of the string or None if the string cannot be converted to a boolean.
         """
 
+        # Check if the value is a string
+        if value is None or not isinstance(
+            value,
+            str,
+        ):
+            # Return None if the value is not a string
+            return None
+
         # Check if the string is in the list of true values
         if value.lower() in {
             "true",
@@ -785,6 +793,14 @@ class DataConversionUtils:
             Optional[bytes]: The bytes representation of the string or None if the string cannot be converted to bytes.
         """
 
+        # Check if the value is a string
+        if value is None or not isinstance(
+            value,
+            str,
+        ):
+            # Return None if the value is not a string
+            return None
+
         try:
             # Attempt to convert the string to bytes
             return value.encode(encoding="utf-8")
@@ -807,6 +823,14 @@ class DataConversionUtils:
             Optional[complex]: The complex number representation of the string or None if the string cannot be converted to a complex number.
         """
 
+        # Check if the value is a string
+        if value is None or not isinstance(
+            value,
+            str,
+        ):
+            # Return None if the value is not a string
+            return None
+
         try:
             # Attempt to convert the string to a complex number
             return complex(value)
@@ -828,6 +852,14 @@ class DataConversionUtils:
         Returns:
             Optional[Counter]: The counter representation of the string or None if the string cannot be converted to a counter.
         """
+
+        # Check if the value is a string
+        if value is None or not isinstance(
+            value,
+            str,
+        ):
+            # Return None if the value is not a string
+            return None
 
         try:
             # Attempt to convert the string to a counter
@@ -852,6 +884,14 @@ class DataConversionUtils:
         Returns:
             Optional[date]: The date representation of the string or None if the string cannot be converted to a date.
         """
+
+        # Check if the value is a string
+        if value is None or not isinstance(
+            value,
+            str,
+        ):
+            # Return None if the value is not a string
+            return None
 
         # Check if no format is specified
         if format is None:
@@ -886,6 +926,14 @@ class DataConversionUtils:
             Optional[datetime]: The datetime representation of the string or None if the string cannot be converted to a datetime.
         """
 
+        # Check if the value is a string
+        if value is None or not isinstance(
+            value,
+            str,
+        ):
+            # Return None if the value is not a string
+            return None
+
         # Check if no format is specified
         if format is None:
             try:
@@ -917,10 +965,18 @@ class DataConversionUtils:
             Optional[Decimal]: The decimal representation of the string or None if the string cannot be converted to a decimal.
         """
 
+        # Check if the value is a string
+        if value is None or not isinstance(
+            value,
+            str,
+        ):
+            # Return None if the value is not a string
+            return None
+
         try:
             # Attempt to convert the string to a decimal
             return Decimal(value)
-        except ValueError:
+        except (ValueError, InvalidOperation):
             # Return None if the string cannot be converted to a decimal
             return None
 
@@ -938,6 +994,14 @@ class DataConversionUtils:
         Returns:
             Optional[defaultdict]: The defaultdict representation of the string or None if the string cannot be converted to a defaultdict.
         """
+
+        # Check if the value is a string
+        if value is None or not isinstance(
+            value,
+            str,
+        ):
+            # Return None if the value is not a string
+            return None
 
         try:
             # Attempt to convert the string to a defaultdict
@@ -961,6 +1025,14 @@ class DataConversionUtils:
             Optional[deque]: The deque representation of the string or None if the string cannot be converted to a deque.
         """
 
+        # Check if the value is a string
+        if value is None or not isinstance(
+            value,
+            str,
+        ):
+            # Return None if the value is not a string
+            return None
+
         try:
             # Attempt to convert the string to a deque
             return deque(cls.str_to_list(value=value))
@@ -982,6 +1054,14 @@ class DataConversionUtils:
         Returns:
             Optional[dict[str, Any]]: The dictionary representation of the string or None if the string cannot be converted to a dictionary.
         """
+
+        # Check if the value is a string
+        if value is None or not isinstance(
+            value,
+            str,
+        ):
+            # Return None if the value is not a string
+            return None
 
         # Check if the string starts with '{' and ends with '}'
         if not value.startswith("{") or not value.endswith("}"):
@@ -1010,6 +1090,14 @@ class DataConversionUtils:
             Optional[float]: The float representation of the string or None if the string cannot be converted to a float.
         """
 
+        # Check if the value is a string
+        if value is None or not isinstance(
+            value,
+            str,
+        ):
+            # Return None if the value is not a string
+            return None
+
         try:
             # Attempt to convert the string to a float
             return float(value)
@@ -1031,6 +1119,14 @@ class DataConversionUtils:
         Returns:
             Optional[Fraction]: The fraction representation of the string or None if the string cannot be converted to a fraction.
         """
+
+        # Check if the value is a string
+        if value is None or not isinstance(
+            value,
+            str,
+        ):
+            # Return None if the value is not a string
+            return None
 
         try:
             # Attempt to convert the string to a fraction
@@ -1054,6 +1150,14 @@ class DataConversionUtils:
             Optional[frozendict]: The frozen dictionary representation of the string or None if the string cannot be converted to a frozen dictionary.
         """
 
+        # Check if the value is a string
+        if value is None or not isinstance(
+            value,
+            str,
+        ):
+            # Return None if the value is not a string
+            return None
+
         try:
             # Attempt to convert the string to a frozen dictionary
             return frozendict(cls.str_to_dict(value=value))
@@ -1075,6 +1179,14 @@ class DataConversionUtils:
         Returns:
             Optional[frozenset]: The frozenset representation of the string or None if the string cannot be converted to a frozenset.
         """
+
+        # Check if the value is a string
+        if value is None or not isinstance(
+            value,
+            str,
+        ):
+            # Return None if the value is not a string
+            return None
 
         try:
             # Attempt to convert the string to a frozenset
@@ -1098,6 +1210,14 @@ class DataConversionUtils:
             Optional[int]: The integer representation of the string or None if the string cannot be converted to an integer.
         """
 
+        # Check if the value is a string
+        if value is None or not isinstance(
+            value,
+            str,
+        ):
+            # Return None if the value is not a string
+            return None
+
         try:
             # Attempt to convert the string to an integer
             return int(value)
@@ -1119,6 +1239,14 @@ class DataConversionUtils:
         Returns:
             Optional[list]: The list representation of the string or None if the string cannot be converted to a list.
         """
+
+        # Check if the value is a string
+        if value is None or not isinstance(
+            value,
+            str,
+        ):
+            # Return None if the value is not a string
+            return None
 
         # Check if the string starts with '[' and ends with ']'
         if not value.startswith("[") or not value.endswith("]"):
@@ -1147,6 +1275,14 @@ class DataConversionUtils:
             Optional[Path]: The path representation of the string or None if the value is not a string.
         """
 
+        # Check if the value is a string
+        if value is None or not isinstance(
+            value,
+            str,
+        ):
+            # Return None if the value is not a string
+            return None
+
         # Convert the string to a path
         path: Path = Path(value)
 
@@ -1174,6 +1310,14 @@ class DataConversionUtils:
         Returns:
              Optional[Set]: The set representation of the string or None if the string cannot be converted to a set.
         """
+
+        # Check if the value is a string
+        if value is None or not isinstance(
+            value,
+            str,
+        ):
+            # Return None if the value is not a string
+            return None
 
         # Check if the string starts with '{' and ends with '}'
         if not value.startswith("{") or not value.endswith("}"):
@@ -1211,6 +1355,14 @@ class DataConversionUtils:
             Optional[time]: The time representation of the string or None if the string cannot be converted to a time.
         """
 
+        # Check if the value is a string
+        if value is None or not isinstance(
+            value,
+            str,
+        ):
+            # Return None if the value is not a string
+            return None
+
         try:
             # Attempt to convert the string to a time using ISO format
             return time.fromisoformat(value)
@@ -1232,6 +1384,14 @@ class DataConversionUtils:
         Returns:
             Optional[timedelta]: The timedelta representation of the string or None if the string cannot be converted to a timedelta.
         """
+
+        # Check if the value is a string
+        if value is None or not isinstance(
+            value,
+            str,
+        ):
+            # Return None if the value is not a string
+            return None
 
         # Import the parse_duration function from isodate locally
         from isodate import parse_duration
@@ -1295,6 +1455,14 @@ class DataConversionUtils:
             Optional[timezone]: The timezone representation of the string or None if the string cannot be converted to a timezone.
         """
 
+        # Check if the value is a string
+        if value is None or not isinstance(
+            value,
+            str,
+        ):
+            # Return None if the value is not a string
+            return None
+
         try:
             # Attempt to convert the string to a timezone
             return timezone(value)
@@ -1316,6 +1484,14 @@ class DataConversionUtils:
         Returns:
             Optional[tuple]: The tuple representation of the string or None if the string cannot be converted to a tuple.
         """
+
+        # Check if the value is a string
+        if value is None or not isinstance(
+            value,
+            str,
+        ):
+            # Return None if the value is not a string
+            return None
 
         # Check if the string starts with '(' and ends with ')'
         if not value.startswith("(") or not value.endswith(")"):
@@ -1352,6 +1528,14 @@ class DataConversionUtils:
         Returns:
             Optional[UUID]: The UUID representation of the string or None if the value is not a string.
         """
+
+        # Check if the value is a string
+        if value is None or not isinstance(
+            value,
+            str,
+        ):
+            # Return None if the value is not a string
+            return None
 
         try:
             # Attempt to convert the string to a UUID
@@ -1971,6 +2155,56 @@ class DataIdentificationUtils:
             return True
         except ValueError:
             # Return False if the value could not be converted to a fraction
+            return False
+
+    @classmethod
+    def could_be_frozendict(
+        cls,
+        value: Any,
+    ) -> bool:
+        """
+        Checks if the value could be converted to a frozendict.
+
+        Args:
+            value (Any): The value to check.
+
+        Returns:
+            bool: True if the value could be converted to a frozendict, False otherwise.
+        """
+
+        try:
+            # Attempt to convert the value to a frozendict
+            frozendict(value)
+
+            # Return True if the value could be converted to a frozendict
+            return True
+        except ValueError:
+            # Return False if the value could not be converted to a frozendict
+            return False
+
+    @classmethod
+    def could_be_frozenset(
+        cls,
+        value: Any,
+    ) -> bool:
+        """
+        Checks if the value could be converted to a frozenset.
+
+        Args:
+            value (Any): The value to check.
+
+        Returns:
+            bool: True if the value could be converted to a frozenset, False otherwise.
+        """
+
+        try:
+            # Attempt to convert the value to a frozenset
+            frozenset(value)
+
+            # Return True if the value could be converted to a frozenset
+            return True
+        except ValueError:
+            # Return False if the value could not be converted to a frozenset
             return False
 
     @classmethod
